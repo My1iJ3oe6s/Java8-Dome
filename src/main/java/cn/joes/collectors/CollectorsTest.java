@@ -1,12 +1,11 @@
 package cn.joes.collectors;
 
 import cn.joes.User;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Lists;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 主要测试Collectors对象的API用法
@@ -28,14 +27,16 @@ public class CollectorsTest {
         users.add(new User(5, "Guava", 30));
         users.add(new User(6, "Spring", 30));
         CollectorsTest collectorsTest = new CollectorsTest();
-        collectorsTest.toMap();
+        collectorsTest.toMap(users);
+        System.out.println(collectorsTest.counting(users));
+        System.out.println(collectorsTest.reduce());
     }
 
-    public List<User> toList() {
+    public List<User> toList(List<User> users) {
         return users.stream().filter(c -> c.getAge() > 25L).collect(Collectors.toList());
     }
 
-    public Set<User> toSet() {
+    public Set<User> toSet(List<User> users) {
         return users.stream().filter(c -> c.getAge() > 25L).collect(Collectors.toSet());
     }
 
@@ -49,7 +50,7 @@ public class CollectorsTest {
      *
      * @return
      */
-    public LinkedHashMap<Integer, User> toMap() {
+    public LinkedHashMap<Integer, User> toMap(List<User> users) {
 
         LinkedHashMap<Integer, User> collect = users.stream().filter(c -> c.getAge() > 25)
                 .collect(Collectors.toMap(c -> c.getAge(), (p) -> p,
@@ -68,7 +69,7 @@ public class CollectorsTest {
      *
      * @return
      */
-    public Map<Boolean, List<User>> partitioningBy() {
+    public Map<Boolean, List<User>> partitioningBy(List<User> users) {
         Map<Boolean, Map<Integer, List<User>>> collect =
                 users.stream().collect(Collectors.partitioningBy(c -> c.getAge() > 35, Collectors.groupingBy(c -> c.getAge())));
 
@@ -81,21 +82,48 @@ public class CollectorsTest {
      *
      * @return
      */
-    public Map<Integer, List<User>> groupingBy() {
+    public Map<Integer, List<User>> groupingBy(List<User> users) {
         HashMap<Integer, List<User>> collect =
                 users.stream().collect(Collectors.groupingBy(c -> c.getAge(), HashMap::new, Collectors.toList()));
+
+        Map<Integer, List<Integer>> collect1 = users.stream()
+                .collect(Collectors.groupingBy(c -> c.getAge(), Collectors.mapping(p -> p.getId(), Collectors.toList())));
 
         return users.stream().collect(Collectors.groupingBy(c -> c.getAge()));
     }
 
-    /*public Map<Integer, List<User>> groupingBy() {
-       // users.stream().
-       // users.stream().collect(Collectors.joining(",","[","]"));
+    public String joininng(List<User> users) {
+        return Stream.of("1", "2", "3", "4").collect(Collectors.joining(",","[","]"));
+    }
 
-        return users.stream().collect(Collectors.groupingBy(c -> c.getAge()));
-    }*/
+    /**
+     * 统计数量
+     *
+     * @param users
+     * @return
+     */
+    public Long counting(List<User> users) {
+        return users.stream().collect(Collectors.counting());
+    }
 
+    /**
+     * reduce
+     *
+     * ram users
+     * @return
+     */
+    public int reduce() {
+        return Stream.of(1, 2, 3, 4).reduce(100, (sum, item) -> sum + item);
+    }
 
-
+    /**
+     * collectingAndThen 针对collerctor的对象做操作
+     *
+     * ram users
+     * @return
+     */
+    public int collectingAndThen(List<User> users) {
+        return users.stream().collect(Collectors.collectingAndThen(Collectors.groupingBy(c -> c.getAge()), Map::size));
+    }
 
 }
