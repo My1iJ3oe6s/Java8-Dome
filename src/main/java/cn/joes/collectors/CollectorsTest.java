@@ -30,6 +30,7 @@ public class CollectorsTest {
         collectorsTest.toMap(users);
         System.out.println(collectorsTest.counting(users));
         System.out.println(collectorsTest.reduce());
+        List<Integer> mapping = collectorsTest.mapping(users);
     }
 
     public List<User> toList(List<User> users) {
@@ -124,6 +125,15 @@ public class CollectorsTest {
      */
     public int collectingAndThen(List<User> users) {
         return users.stream().collect(Collectors.collectingAndThen(Collectors.groupingBy(c -> c.getAge()), Map::size));
+    }
+
+    /**
+     * mapping():获取某个list对象属性的集合
+     *
+     */
+    public List<Integer> mapping(List<User> users) {
+        return users.stream()
+                .collect(Collectors.mapping(p -> p.getAge(), Collectors.toList()));
     }
 
 }
